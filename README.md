@@ -12,3 +12,7 @@ A simple and small chat app with custom CSS to learn more about [socket.io](http
 
 - Socket IO
 - Get query from URLs using qs
+
+## Todos
+
+- Better responsiveness
