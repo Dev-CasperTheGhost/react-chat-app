@@ -1,0 +1,8 @@
+{
+  "short_name": "Chatty",
+  "name": "Chatty - React chat app",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#6799f3",
+  "background_color": "#6799f3"
+}
