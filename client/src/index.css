@@ -20,7 +20,8 @@ body {
 }
 
 .username-container form {
-  width: 30%;
+  width: 350px;
+  max-width: 90%;
   padding: 20px;
   border-radius: 10px;
   background-color: #ffffff;
@@ -84,7 +85,8 @@ body {
   background-color: white;
   width: 1000px;
   max-width: 90%;
-  height: 45%;
+  height: 700px;
+  max-height: 70%;
 }
 
 .chat-header {
