@@ -15,11 +15,18 @@ export default class Index extends Component {
     });
   };
 
+
+  onSubmit = e => {
+    e.preventDefault();
+
+    this.props.history.push(`/chat?username=${this.state.username}`)
+  }
+  
   render() {
     const { username } = this.state;
     return (
       <div className='username-container'>
-        <form action='/chat'>
+        <form onSubmit={this.onSubmit}>
           <h3>Please enter a username</h3>
           <div className='form-group'>
             <label htmlFor='username'>Enter Username</label>
