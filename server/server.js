@@ -11,22 +11,31 @@ app.use(cors({ origin: 'http://chatty.caspertheghost.me' }));
 app.use(helmet());
 
 io.on("connection", socket => {
+    socket.emit("message", { username: "System", message: "Welcome to chatty" });
+
+
     const users = [];
 
     function getUserById(id) {
         return users.find(user => user.id === id);
     }
 
-    socket.emit("message", { username: "System", message: "Welcome to chatty" });
-
-
 
     socket.on("joined", (data) => {
         const user = { username: data.username, id: socket.id };
         users.push(user);
 
+        socket.broadcast.emit("users", { users: users })
         socket.broadcast.emit("message", { username: "System", message: `${data.username} has joined the chat!` });
     });
+
+    socket.on("startedTyping", () => {
+        socket.broadcast.emit("isTyping", true)
+    })
+
+    socket.on("stoppedTyping", () => {
+        socket.broadcast.emit("isTyping", false)
+    })
 
 
     socket.on("disconnect", () => {

@@ -29,7 +29,7 @@ export default class Chat extends Component {
     });
 
     this.setState({
-      username: username,
+      username,
     });
 
     socket.emit('joined', { username, id: socket.id });
@@ -61,7 +61,9 @@ export default class Chat extends Component {
       return (
         <div key={index} className='message'>
           <div className='message-header'>
-            {item.username === username ? 'You' : item.username}
+            {item.username === username
+              ? `You (${item.username})`
+              : item.username}
           </div>
           <div className='message-body'>{item.message}</div>
         </div>
@@ -76,6 +78,7 @@ export default class Chat extends Component {
           <div className='chat-messages'>{messagesMapped}</div>
           <form onSubmit={this.onSubmit} className='chat-form'>
             <input
+              autoFocus={true}
               className='form-input send-input'
               type='text'
               name='message'
