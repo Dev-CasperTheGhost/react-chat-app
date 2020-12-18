@@ -1,99 +1,81 @@
-import React, { Component } from 'react';
-import io from 'socket.io-client';
-import qs from 'qs';
-const socket = io('http://localhost:3001');
+import io from "socket.io-client";
+import qs from "qs";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+const socket = io("http://localhost:3001");
 
-export default class Chat extends Component {
-  constructor() {
-    super();
+function Chat() {
+  const location = useLocation();
+  const parsedQs = qs.parse(location.search, {
+    ignoreQueryPrefix: true,
+  });
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [username, setUsername] = useState("");
 
-    this.state = {
-      message: '',
-      username: '',
-      messages: [],
-    };
-  }
+  useEffect(() => {
+    setUsername(parsedQs.username);
 
-  componentDidMount() {
-    socket.on('message', (message) => {
-      this.setState({
-        messages: [...this.state.messages, message],
-      });
+    socket.emit("joined", { username: parsedQs.username, id: socket.id });
+  }, [parsedQs.username]);
 
-      const chatMessages = document.querySelector('.chat-messages');
+  useEffect(() => {
+    socket.on("message", (message) => {
+      setMessages((msgs) => [...msgs, message]);
+
+      const chatMessages = document.querySelector(".chat-messages");
       chatMessages.scrollTop = chatMessages.scrollHeight;
     });
+  }, []);
 
-    const { username } = qs.parse(this.props.location.search, {
-      ignoreQueryPrefix: true,
-    });
-
-    this.setState({
-      username,
-    });
-
-    socket.emit('joined', { username, id: socket.id });
-  }
-
-  onChange = (e) => {
-    this.setState({
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  onSubmit = (e) => {
+  function onSubmit(e) {
     e.preventDefault();
-    const { message } = this.state;
 
-    if (message === '' || !message) return;
+    if (message === "" || !message) return;
 
-    socket.emit('chatMessage', message);
+    socket.emit("chatMessage", message);
 
     // Clear input
-    this.setState({
-      message: '',
-    });
-  };
+    setMessage("");
+  }
 
-  render() {
-    const { message, messages, username } = this.state;
-    const messagesMapped = messages.map((item, index) => {
-      return (
-        <div key={index} className='message'>
-          <div className='message-header'>
-            {item.username === username
-              ? `You (${item.username})`
-              : item.username}
-          </div>
-          <div className='message-body'>{item.message}</div>
-        </div>
-      );
-    });
+  const messagesMapped = messages.map((item, index) => {
     return (
-      <div className='chat-container'>
-        <div className='chat'>
-          <div className='chat-header'>
-            <h2>Chat</h2>
-          </div>
-          <div className='chat-messages'>{messagesMapped}</div>
-          <form onSubmit={this.onSubmit} className='chat-form'>
-            <input
-              autoFocus={true}
-              className='form-input send-input'
-              type='text'
-              name='message'
-              id='message'
-              value={message}
-              onChange={this.onChange}
-              placeholder='Enter message...'
-              required
-            />
-            <button className='send-message form-input' type='submit'>
-              Send
-            </button>
-          </form>
+      <div key={index} className="message">
+        <div className="message-header">
+          {item.username === username ? `You (${item.username})` : item.username}
         </div>
+        <div className="message-body">{item.message}</div>
       </div>
     );
-  }
+  });
+
+  return (
+    <div className="chat-container">
+      <div className="chat">
+        <div className="chat-header">
+          <h2>Chat</h2>
+        </div>
+        <div className="chat-messages">{messagesMapped}</div>
+        <form onSubmit={onSubmit} className="chat-form">
+          <input
+            autoFocus={true}
+            className="form-input send-input"
+            type="text"
+            name="message"
+            id="message"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Enter message..."
+            required
+          />
+          <button className="send-message form-input" type="submit">
+            Send
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 }
+
+export default Chat;
